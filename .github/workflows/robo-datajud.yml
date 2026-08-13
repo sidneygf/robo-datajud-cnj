@@ -42,7 +42,7 @@ jobs:
           DIAS_JANELA: ${{ github.event.inputs.dias_janela || '365' }}
           # Só defina o Secret DATAJUD_API_KEY se o CNJ alterar a chave pública.
           DATAJUD_API_KEY: ${{ secrets.DATAJUD_API_KEY }}
-          GDRIVE_CREDENTIALS_JSON: ${{ secrets.GDRIVE_CREDENTIALS_JSON }}
+          GDRIVE_CREDENTIALS_JSON: ${{ secrets.GDRIVE_CREDENTIALS }}
           GDRIVE_FOLDER_ID: ${{ secrets.GDRIVE_FOLDER_ID }}
         run: python robo_datajud.py
 
