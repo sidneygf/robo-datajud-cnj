@@ -1,6 +1,10 @@
 name: Robô DataJud CNJ
 
 on:
+  push:
+    paths:
+      - 'robo_datajud.py'
+      - '.github/workflows/robo-datajud.yml'
   schedule:
     # 12:00 UTC = 09:00 em Brasília (horário padrão, UTC-3).
     # Segunda, quarta e sexta. A base do CNJ tem 5-7 semanas de atraso;
