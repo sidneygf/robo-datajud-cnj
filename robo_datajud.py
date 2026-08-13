@@ -30,9 +30,9 @@ GDRIVE_FOLDER_ID = os.environ.get("GDRIVE_FOLDER_ID", "")
 
 # Chave pública oficial do CNJ (divulgada em datajud-wiki.cnj.jus.br/api-publica/acesso).
 # Pode ser sobrescrita por Secret do repositório caso o CNJ a altere.
-API_KEY = os.environ.get(
-    "DATAJUD_API_KEY",
-    "cDZHYzlZa0JadVREZDJCendQbXY6SkJlTzNjLV9TRENyQk1RdnFKZGRQdw==",
+API_KEY = (
+    os.environ.get("DATAJUD_API_KEY")
+    or "cDZHYzlZa0JadVREZDJCendQbXY6SkJlTzNjLV9TRENyQk1RdnFKZGRQdw=="
 )
 
 # Janela de ajuizamento considerada, em dias (a base tem 5-7 semanas de atraso).
