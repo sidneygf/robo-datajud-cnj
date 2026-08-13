@@ -1,1 +1,62 @@
+name: Robô DataJud CNJ
 
+on:
+  schedule:
+    # 12:00 UTC = 09:00 em Brasília (horário padrão, UTC-3).
+    # Segunda, quarta e sexta. A base do CNJ tem 5-7 semanas de atraso;
+    # rodar diariamente não traz dado novo.
+    - cron: '0 12 * * 1,3,5'
+  workflow_dispatch:          # permite disparo manual pelo botão "Run workflow"
+    inputs:
+      dias_janela:
+        description: 'Janela de ajuizamento em dias'
+        required: false
+        default: '365'
+
+permissions:
+  contents: write             # necessário para o robô commitar a planilha de volta
+
+jobs:
+  coletar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Instalar dependências
+        run: pip install requests openpyxl google-api-python-client google-auth
+
+      - name: Executar o robô
+        env:
+          DIAS_JANELA: ${{ github.event.inputs.dias_janela || '365' }}
+          # Só defina o Secret DATAJUD_API_KEY se o CNJ alterar a chave pública.
+          DATAJUD_API_KEY: ${{ secrets.DATAJUD_API_KEY }}
+          GDRIVE_CREDENTIALS_JSON: ${{ secrets.GDRIVE_CREDENTIALS_JSON }}
+          GDRIVE_FOLDER_ID: ${{ secrets.GDRIVE_FOLDER_ID }}
+        run: python robo_datajud.py
+
+      - name: Publicar planilha como artefato
+        uses: actions/upload-artifact@v4
+        with:
+          name: distribuicoes-${{ github.run_number }}
+          path: saida/*.xlsx
+          retention-days: 90
+
+      - name: Commitar resultados no repositório
+        run: |
+          git config user.name  "robo-datajud"
+          git config user.email "actions@github.com"
+          git add saida/ estado/
+          if git diff --staged --quiet; then
+            echo "Nenhuma alteração — nada a commitar."
+          else
+            git commit -m "Coleta DataJud $(date -u +'%d/%m/%Y')"
+            git push
+          fi
